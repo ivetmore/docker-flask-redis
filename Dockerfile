@@ -7,6 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5000
+RUN apt-get update && apt-get install -y redis-server && rm -rf /var/lib/apt/lists/*
 
-CMD ["python", "app.py"]
+CMD redis-server --daemonize yes && python3 app.py
