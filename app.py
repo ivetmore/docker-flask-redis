@@ -2,11 +2,10 @@ import logging
 from flask import Flask, jsonify
 import redis
 
-# Configure Logging
+# Configure logging
 logging.basicConfig(
-   level=logging.INFO,
-   format="%(asctime)s | %(levelname)s | %(message)s"
-
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -21,26 +20,22 @@ try:
 except Exception as e:
     logger.error(f"Redis connection failed: {e}")
     r = None
-@app.route("/")
-def home():
-	return "Hello from Flask and Redis with Docker Compose!"
 
 @app.route("/count")
 def count():
     try:
         visits = r.incr("counter")
         logger.info(f"/count endpoint called. Visits={visits}")
-        return jsonify({ "visits": visits})
+        return jsonify({"visits": visits})
     except Exception as e:
         logger.error(f"Error in /count endpoint: {e}")
-        return jsonify({"error: "Redis unavailable"}), 500
+        return jsonify({"error": "Redis unavailable"}), 500
 
 @app.route("/health")
 def health():
     try:
         r.ping()
-	return jsonify({"status": "OK", "redis": "connected})
+        return jsonify({"status": "OK", "redis": "connected"})
     except Exception as e:
-       logger.error(f"Health check failed: {e}")
-       return jsonify({"status": "ERROR", "redis": "disconnected"}), 500
-
+        logger.error(f"Health check failed: {e}")
+        return jsonify({"status": "ERROR", "redis": "disconnected"}), 500
