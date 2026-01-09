@@ -28,7 +28,7 @@ def home():
 @app.route("/count")
 def count():
     try:
-	visits = r.incr("counter")
+        visits = r.incr("counter")
         logger.info(f"/count endpoint called. Visits={visits}")
         return jsonify({ "visits": visits})
     except Exception as e:
