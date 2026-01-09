@@ -28,7 +28,7 @@ def home():
 @app.route("/count")
 def count():
     try:
-	visits =  r.incr("counter")
+	visits = r.incr("counter")
         logger.info(f"/count endpoint called. Visits={visits}")
         return jsonify({ "visits": visits})
     except Exception as e:
@@ -39,7 +39,7 @@ def count():
 def health():
     try:
         r.ping()
-	return jsonify({ "status": "OK", "redis": "connected}) 
+	return jsonify({"status": "OK", "redis": "connected})
     except Exception as e:
        logger.error(f"Health check failed: {e}")
        return jsonify({"status": "ERROR", "redis": "disconnected"}), 500
