@@ -45,13 +45,25 @@ def count():
 
 @app.route("/health")
 def health():
+    if r is None:
+        logger.warning("Health check: Redis not initialized")
+        return jsonify({
+            "status": "DEGRADED",
+            "redis": "unavailable"
+        }), 200
+
     try:
         r.ping()
-        return jsonify({"status": "OK", "redis": "connected"})
+        return jsonify({
+            "status": "OK",
+            "redis": "connected"
+        }), 200
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        return jsonify({"status": "ERROR", "redis": "disconnected"}), 500
-
+        return jsonify({
+            "status": "DEGRADED",
+            "redis": "unreachable"
+        }), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
