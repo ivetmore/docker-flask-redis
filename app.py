@@ -14,18 +14,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Redis connection
-try:
-    r = redis.Redis(
-        host=os.getenv("REDIS_HOST", "redis"),
-        port=6379,
-        decode_responses=True
-    )
-    r.ping()
-    logger.info("Connected to Redis successfully")
-except Exception as e:
-    logger.error(f"Redis connection failed: {e}")
-    r = None
+REDIS_URL = os.getenv("REDIS_URL")
 
+r = None
+if REDIS_URL:
+    try:
+        r = redis.from_url(REDIS_URL, decode_responses=True)
+        r.ping()
+        logger.info("Connected to Redis via REDIS_URL")
+    except Exception as e:
+        logger.error(f"Redis connection failed: {e}")
+else:
+    logger.warning("REDIS_URL not set; Redis will be unavailable")
 
 @app.route("/")
 def home():
