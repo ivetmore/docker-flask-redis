@@ -5,55 +5,51 @@ import os
 
 app = Flask(__name__)
 
-# Configure logging
+# Logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-
 logger = logging.getLogger(__name__)
 
-# Redis connection
-REDIS_URL = os.getenv("REDIS_URL")
+# Redis initialization
+redis_client = None
 
-r = None
-if REDIS_URL:
+def init_redis():
+    global redis_client
+    redis_url = os.environ.get("REDIS_URL")
+
+    if not redis_url:
+        logger.warning("REDIS_URL not set. Redis will not be initialized.")
+        return
+
     try:
-        r = redis.from_url(REDIS_URL, decode_responses=True)
-        r.ping()
-        logger.info("Connected to Redis via REDIS_URL")
+        redis_client = redis.from_url(redis_url, decode_responses=True)
+        redis_client.ping()
+        logger.info("Connected to Redis successfully")
     except Exception as e:
         logger.error(f"Redis connection failed: {e}")
-else:
-    logger.warning("REDIS_URL not set; Redis will be unavailable")
+        redis_client = None
 
+# Initialize Redis when app starts
+init_redis()
+
+# Routes
 @app.route("/")
 def home():
-    return "Hello from Flask and Redis with Docker Compose!"
-
-
-@app.route("/count")
-def count():
-    try:
-        visits = r.incr("counter")
-        logger.info(f"/count endpoint called. Visits={visits}")
-        return jsonify({"visits": visits})
-    except Exception as e:
-        logger.error(f"Error in /count endpoint: {e}")
-        return jsonify({"error": "Redis unavailable"}), 500
-
+    return "Hello from Flask + Redis on Render!"
 
 @app.route("/health")
 def health():
-    if r is None:
+    if redis_client is None:
         logger.warning("Health check: Redis not initialized")
         return jsonify({
             "status": "DEGRADED",
-            "redis": "unavailable"
+            "redis": "not connected"
         }), 200
 
     try:
-        r.ping()
+        redis_client.ping()
         return jsonify({
             "status": "OK",
             "redis": "connected"
@@ -65,6 +61,27 @@ def health():
             "redis": "unreachable"
         }), 200
 
+@app.route("/count")
+def count():
+    if redis_client is None:
+        logger.error("Redis not initialized in /count")
+        return jsonify({
+            "error": "Redis not initialized"
+        }), 500
+
+    try:
+        visits = redis_client.incr("counter")
+        logger.info(f"/count called. Visits={visits}")
+        return jsonify({
+            "visits": visits
+        }), 200
+    except Exception as e:
+        logger.error(f"Error in /count endpoint: {e}")
+        return jsonify({
+            "error": "Redis error"
+        }), 500
+
+# App entry point
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
