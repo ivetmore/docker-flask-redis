@@ -11,6 +11,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 logger = logging.getLogger(__name__)
+logger.info("Flask application starting up")
 
 # Redis initialization
 redis_client = None
