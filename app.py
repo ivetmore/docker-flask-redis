@@ -1,15 +1,20 @@
-from flask import Flask, jsonify, request
+from flask, collections import Flask, jsonify, request
 import redis
 import logging
 import os
 import time
 import json
+import defaultdict
 
 app = Flask(__name__)
+
+request_counts = defaultdict(int)
 
 @app.before_request
 def log_request():
     request.start_time = time.time()
+    request_counts{request.path] += 1
+
     if request.path == "/health":
         logger.debug(f"Incoming request: {request.method} {request.path}")
     else:
@@ -92,6 +97,13 @@ def count():
         return jsonify({
             "error": "Redis error"
         }), 500
+
+@app.route("/metrics")
+def metrics():
+    return jsonify({
+        "requests_total": sum(request_counts.values()),
+        "requests_by_path": dict(request_counts)
+    }), 200
 
 @app.after_request
 def log_response(response):
