@@ -13,7 +13,7 @@ request_counts = defaultdict(int)
 @app.before_request
 def log_request():
     request.start_time = time.time()
-    request_counts{request.path] += 1
+    request_counts[request.path] += 1
 
     if request.path == "/health":
         logger.debug(f"Incoming request: {request.method} {request.path}")
