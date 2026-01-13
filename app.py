@@ -99,7 +99,7 @@ def log_response(response):
             "method": request.method,
             "path": request.path,
             "status": response.status_code,
-            "duration_ms": duration, round(duration *1000, 2)
+            "duration_ms": round(duration *1000, 2)
             "ip": request.remote_addr
         })
     )
