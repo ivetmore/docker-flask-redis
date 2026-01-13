@@ -91,7 +91,7 @@ def count():
             "error": "Redis error"
         }), 500
 
-@app.after.request
+@app.after_request
 def log_response(response):
     duration = time.time - request.start_time
     logger.info(
