@@ -99,7 +99,7 @@ def log_response(response):
             "method": request.method,
             "path": request.path,
             "status": response.status_code,
-            "duration_ms": round(duration *1000, 2)
+            "duration_ms": round(duration *1000, 2),
             "ip": request.remote_addr
         })
     )
@@ -108,4 +108,5 @@ def log_response(response):
 # App entry point
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
 
