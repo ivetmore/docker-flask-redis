@@ -98,7 +98,7 @@ def log_request(response):
     log_data = {
         "method": request.method,
         "path": request.path,
-        "status": response,status_code,
+        "status": response.status_code,
         "duration_ms": duration,
         "ip": request.remote_addr
     }
