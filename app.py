@@ -1,9 +1,14 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import redis
 import logging
 import os
+import time
 
 app = Flask(__name__)
+
+@app.before_request:
+def start_timer:
+    request.start_time = time.time()
 
 # Logging configuration
 logging.basicConfig(
@@ -84,6 +89,17 @@ def count():
         return jsonify({
             "error": "Redis error"
         }), 500
+
+@app.after.request:
+def log_request(response):
+    duration = round((time.time() - request.start_time) * 1000, 2)
+    logger.info(
+        f"{request.method} {request.path} "
+        f"| status={response.status_code} "
+        f"| duration={duration}ms "
+        f"| ip={request.remote_addr}"
+    )
+    return response
  
 # App entry point
 if __name__ == "__main__":
