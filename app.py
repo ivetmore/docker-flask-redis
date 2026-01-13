@@ -3,6 +3,7 @@ import redis
 import logging
 import os
 import time
+import json
 
 app = Flask(__name__)
 
@@ -93,14 +94,18 @@ def count():
 @app.after.request:
 def log_request(response):
     duration = round((time.time() - request.start_time) * 1000, 2)
-    logger.info(
-        f"{request.method} {request.path} "
-        f"| status={response.status_code} "
-        f"| duration={duration}ms "
-        f"| ip={request.remote_addr}"
-    )
+
+    log_data = {
+        "method": request.method,
+        "path": request.path,
+        "status": response,status_code,
+        "duration_ms": duration,
+        "ip": request.remote_addr
+    }
+
+    logger.info(json.dumps(log_data))
     return response
- 
+
 # App entry point
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
