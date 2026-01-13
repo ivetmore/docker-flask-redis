@@ -1,10 +1,10 @@
-from flask, collections import Flask, jsonify, request
+from flask import Flask, jsonify, request
+from collections import defaultdict
 import redis
 import logging
 import os
 import time
 import json
-import defaultdict
 
 app = Flask(__name__)
 
