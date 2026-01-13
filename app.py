@@ -93,13 +93,13 @@ def count():
 
 @app.after_request
 def log_response(response):
-    duration = time.time - request.start_time
+    duration = time.time() - request.start_time
     logger.info(
         json.dumps({
             "method": request.method,
             "path": request.path,
             "status": response.status_code,
-            "duration_ms": duration,
+            "duration_ms": duration, round(duration *1000, 2)
             "ip": request.remote_addr
         })
     )
