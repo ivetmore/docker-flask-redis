@@ -38,10 +38,13 @@ init_redis()
 # Routes
 @app.route("/")
 def home():
-    return "Hello from Flask + Redis on Render!"
+    logger.info("Home endpoint `/` accessed")
+    return "Hello from Flask + Redis with Docker Compose!"
 
 @app.route("/health")
 def health():
+    logger.info("/health endpoint accessed")
+
     if redis_client is None:
         logger.warning("Health check: Redis not initialized")
         return jsonify({
@@ -81,7 +84,7 @@ def count():
         return jsonify({
             "error": "Redis error"
         }), 500
-
+ 
 # App entry point
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
