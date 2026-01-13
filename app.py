@@ -7,7 +7,7 @@ import json
 
 app = Flask(__name__)
 
-@app.before_request:
+@app.before_request
 def start_timer():
     request.start_time = time.time()
 
@@ -91,7 +91,7 @@ def count():
             "error": "Redis error"
         }), 500
 
-@app.after.request:
+@app.after.request
 def log_request(response):
     duration = round((time.time() - request.start_time) * 1000, 2)
 
