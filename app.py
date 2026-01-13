@@ -8,9 +8,9 @@ import json
 app = Flask(__name__)
 
 @app.before_request
-def start_timer():
+def log_request():
     request.start_time = time.time()
-
+    logger.info(f"Incoming request: {request.method} {request.path}")
 # Logging configuration
 logging.basicConfig(
     level=logging.INFO,
@@ -92,18 +92,17 @@ def count():
         }), 500
 
 @app.after.request
-def log_request(response):
-    duration = round((time.time() - request.start_time) * 1000, 2)
-
-    log_data = {
-        "method": request.method,
-        "path": request.path,
-        "status": response.status_code,
-        "duration_ms": duration,
-        "ip": request.remote_addr
-    }
-
-    logger.info(json.dumps(log_data))
+def log_response(response):
+    duration = time.time - request.start_time
+    logger.info(
+        json.dumps({
+            "method": request.method,
+            "path": request.path,
+            "status": response.status_code,
+            "duration_ms": duration,
+            "ip": request.remote_addr
+        })
+    )
     return response
 
 # App entry point
