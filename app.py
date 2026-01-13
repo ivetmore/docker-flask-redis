@@ -10,7 +10,11 @@ app = Flask(__name__)
 @app.before_request
 def log_request():
     request.start_time = time.time()
-    logger.info(f"Incoming request: {request.method} {request.path}")
+    if request.path == "/health":
+        logger.debug(f"Incoming request: {request.method} {request.path}")
+    else:
+        logger.info(f"Incoming request: {request.method} {request.path}")
+
 # Logging configuration
 logging.basicConfig(
     level=logging.INFO,
@@ -44,12 +48,10 @@ init_redis()
 # Routes
 @app.route("/")
 def home():
-    logger.info("Home endpoint `/` accessed")
     return "Hello from Flask + Redis with Docker Compose!"
 
 @app.route("/health")
 def health():
-    logger.info("/health endpoint accessed")
 
     if redis_client is None:
         logger.warning("Health check: Redis not initialized")
