@@ -8,7 +8,7 @@ import json
 app = Flask(__name__)
 
 @app.before_request:
-def start_timer:
+def start_timer():
     request.start_time = time.time()
 
 # Logging configuration
