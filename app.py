@@ -84,15 +84,14 @@ def count():
         logger.error("Redis not initialized in /count")
         return jsonify({
             "error": "Redis not initialized"
-        }), 500
+        }), 503
 
     try:
         visits = redis_client.incr("counter")
         logger.info(f"/count called. Visits={visits}")
         return jsonify({
             "visits": visits
-        }), 200
-    except Exception as e:
+        }), 200    except Exception as e:
         logger.error(f"Error in /count endpoint: {e}")
         return jsonify({
             "error": "Redis error"
