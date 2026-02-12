@@ -8,6 +8,8 @@ import json
 
 app = Flask(__name__)
 
+init_redis()
+
 request_counts = defaultdict(int)
 
 @app.before_request
@@ -32,17 +34,46 @@ logger.info("Flask application starting up")
 redis_client = None
 
 def init_redis():
+    """
+    Initialize Redis client.
+    Works with either:
+      - REDIS_URL (preferred if provided)
+      - REDIS_HOST + REDIS_PORT (what we're using in ECS)
+    """
     global redis_client
-    redis_url = os.environ.get("REDIS_URL")
 
-    if not redis_url:
-        logger.warning("REDIS_URL not set. Redis will not be initialized.")
-        return
+    redis_url = os.getenv("REDIS_URL")
+    redis_host = os.getenv("REDIS_HOST")
+    redis_port = int(os.getenv("REDIS_PORT", "6379"))
 
     try:
-        redis_client = redis.from_url(redis_url, decode_responses=True)
+        if redis_url:
+            # If you ever store a full URL, this supports it
+            redis_client = redis.Redis.from_url(
+                redis_url,
+                decode_responses=True,
+                ssl=True,
+                socket_connect_timeout=2,
+                socket_timeout=2,
+            )
+        else:
+            if not redis_host:
+                logger.warning("REDIS_HOST not set. Redis will not be initialized.")
+                redis_client = None
+                return
+
+            redis_client = redis.Redis(
+                host=redis_host,
+                port=redis_port,
+                decode_responses=True,
+                ssl=True,
+                socket_connect_timeout=2,
+                socket_timeout=2,
+            )
+
         redis_client.ping()
         logger.info("Connected to Redis successfully")
+
     except Exception as e:
         logger.error(f"Redis connection failed: {e}")
         redis_client = None
