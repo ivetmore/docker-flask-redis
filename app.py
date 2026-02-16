@@ -88,20 +88,13 @@ def home():
 
 @app.route("/health")
 def health():
-
-    if redis_client is None:
-        logger.warning("Health check: Redis not initialized")
-        return jsonify({
-            "status": "DEGRADED",
-            "redis": "not connected"
-        }), 200
-
     try:
         redis_client.ping()
         return jsonify({
             "status": "OK",
             "redis": "connected"
         }), 200
+
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return jsonify({
