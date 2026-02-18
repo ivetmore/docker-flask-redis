@@ -88,19 +88,17 @@ def home():
 
 @app.route("/health")
 def health():
+    logger.info("/health endpoint accessed")
+
+    if redis_client is None:
+        return jsonify({"status": "DEGRADED", "redis": "not connected"}), 200
+
     try:
         redis_client.ping()
-        return jsonify({
-            "status": "OK",
-            "redis": "connected"
-        }), 200
-
+        return jsonify({"status": "OK", "redis": "connected"}), 200
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        return jsonify({
-            "status": "DEGRADED",
-            "redis": "unreachable"
-        }), 200
+        return jsonify({"status": "DEGRADED", "redis": "unreachable"}), 200
 
 @app.route("/count")
 def count():
@@ -116,8 +114,7 @@ def count():
         return jsonify({
             "visits": visits
         }), 200
-
-     except Exception as e:
+    except Exception as e:
         logger.error(f"Error in /count endpoint: {e}")
         return jsonify({
             "error": "Redis error"
