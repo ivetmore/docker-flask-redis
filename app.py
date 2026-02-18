@@ -116,7 +116,7 @@ def count():
         return jsonify({
             "visits": visits
         }), 200
-   
+
      except Exception as e:
         logger.error(f"Error in /count endpoint: {e}")
         return jsonify({
