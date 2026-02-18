@@ -115,7 +115,9 @@ def count():
         logger.info(f"/count called. Visits={visits}")
         return jsonify({
             "visits": visits
-        }), 200    except Exception as e:
+        }), 200
+   
+     except Exception as e:
         logger.error(f"Error in /count endpoint: {e}")
         return jsonify({
             "error": "Redis error"
