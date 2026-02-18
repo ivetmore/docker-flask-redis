@@ -8,8 +8,6 @@ import json
 
 app = Flask(__name__)
 
-init_redis()
-
 request_counts = defaultdict(int)
 
 @app.before_request
